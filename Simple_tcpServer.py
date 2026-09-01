@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Bob: servidor TCP que recebe, decifra e devolve a mensagem em maiusculas."""
+"""Bob: servidor TCP que recebe, decifra e devolve a mensagem em maiúsculas."""
 
 import argparse
 import sys
@@ -23,7 +23,7 @@ DEFAULT_PORT = 1300
 
 
 def parse_args() -> argparse.Namespace:
-    """Le o endereco local e a porta de escuta do Bob."""
+    """Lê o endereço local e a porta de escuta do Bob."""
 
     parser = argparse.ArgumentParser(
         description="Servidor Bob: troca de chaves e mensagem RSA-4096"
@@ -31,13 +31,13 @@ def parse_args() -> argparse.Namespace:
     parser.add_argument(
         "--host",
         default=DEFAULT_HOST,
-        help=f"endereco local para escutar (padrao: {DEFAULT_HOST})",
+        help=f"endereço local para escutar (padrão: {DEFAULT_HOST})",
     )
     parser.add_argument(
         "--port",
         type=int,
         default=DEFAULT_PORT,
-        help=f"porta TCP de escuta (padrao: {DEFAULT_PORT})",
+        help=f"porta TCP de escuta (padrão: {DEFAULT_PORT})",
     )
     return parser.parse_args()
 
@@ -61,12 +61,12 @@ def main() -> None:
                 alice_payload = receive_json(reader)
                 alice_public_key = public_key_from_payload(alice_payload)
                 print(
-                    f"[Bob] Chave publica de Alice recebida "
+                    f"[Bob] Chave pública de Alice recebida "
                     f"({alice_public_key.n.bit_length()} bits)."
                 )
 
-                # A chave publica de Bob tambem viaja em texto puro para a
-                # proxima etapa poder usar a cifragem RSA.
+                # A chave pública de Bob também viaja em texto puro para a
+                # próxima etapa poder usar a cifragem RSA.
                 send_json(connection_socket, public_key_to_payload(public_key, "Bob"))
 
                 message_payload = receive_json(reader)
@@ -82,7 +82,7 @@ def main() -> None:
                     connection_socket,
                     encrypted_payload(encrypted_response, "encrypted_response"),
                 )
-                print("[Bob] Resposta em maiusculas cifrada e enviada a Alice.")
+                print("[Bob] Resposta em maiúsculas cifrada e enviada a Alice.")
 
 
 if __name__ == "__main__":

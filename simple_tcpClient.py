@@ -28,7 +28,7 @@ DEFAULT_MESSAGE = (
 
 
 def parse_args() -> argparse.Namespace:
-    """Le o endereco do Bob e permite substituir a mensagem padrao."""
+    """Lê o endereço do Bob e permite substituir a mensagem padrão."""
 
     parser = argparse.ArgumentParser(
         description="Cliente Alice: troca de chaves e mensagem RSA-4096"
@@ -37,25 +37,25 @@ def parse_args() -> argparse.Namespace:
         "server",
         nargs="?",
         default=DEFAULT_SERVER,
-        help=f"IP ou hostname do Bob (padrao: {DEFAULT_SERVER})",
+        help=f"IP ou hostname do Bob (padrão: {DEFAULT_SERVER})",
     )
     parser.add_argument(
         "--port",
         type=int,
         default=DEFAULT_PORT,
-        help=f"porta TCP do Bob (padrao: {DEFAULT_PORT})",
+        help=f"porta TCP do Bob (padrão: {DEFAULT_PORT})",
     )
     parser.add_argument(
         "--message",
         default=DEFAULT_MESSAGE,
-        help="mensagem UTF-8; por padrao usa a mensagem da atividade",
+        help="mensagem UTF-8; por padrão usa a mensagem da atividade",
     )
     return parser.parse_args()
 
 
 def main() -> None:
-    # O cronometro comeca antes da geracao das chaves, como solicitado na
-    # atividade, e termina logo depois da apresentacao da resposta maiuscula.
+    # O cronômetro começa antes da geração das chaves, como solicitado na
+    # atividade, e termina logo depois da apresentação da resposta maiúscula.
     start_time = time.perf_counter()
     args = parse_args()
     message = args.message.encode("utf-8")
@@ -67,12 +67,12 @@ def main() -> None:
     with socket(AF_INET, SOCK_STREAM) as client_socket:
         client_socket.connect((args.server, args.port))
         with client_socket.makefile("rb") as reader:
-            # A chave publica de Alice viaja sem cifragem, conforme a etapa 4.
+            # A chave pública de Alice viaja sem cifragem, conforme a etapa 4.
             send_json(client_socket, public_key_to_payload(public_key, "Alice"))
             bob_payload = receive_json(reader)
             bob_public_key = public_key_from_payload(bob_payload)
             print(
-                f"[Alice] Chave publica de Bob recebida "
+                f"[Alice] Chave pública de Bob recebida "
                 f"({bob_public_key.n.bit_length()} bits)."
             )
 
@@ -90,12 +90,12 @@ def main() -> None:
             uppercase_message = rsa_decrypt(encrypted_response, private_key)
             uppercase_text = uppercase_message.decode("utf-8")
 
-            print(f"[Alice] Mensagem maiuscula recebida: {uppercase_text}", flush=True)
+            print(f"[Alice] Mensagem maiúscula recebida: {uppercase_text}", flush=True)
             end_time = time.perf_counter()
 
     elapsed_ms = (end_time - start_time) * 1000.0
     print(
-        f"[Alice] RTT total (inicio do programa ate a apresentacao): "
+        f"[Alice] RTT total (início do programa até a apresentação): "
         f"{elapsed_ms:.3f} ms"
     )
 

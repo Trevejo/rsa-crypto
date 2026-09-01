@@ -1,15 +1,15 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""Rotinas didaticas para gerar e utilizar chaves RSA de 4096 bits.
+"""Rotinas didáticas para gerar e utilizar chaves RSA de 4096 bits.
 
-O teste de primalidade e baseado no algoritmo Miller-Rabin fornecido no
-arquivo ``primo_hyper.py``. A geracao dos candidatos segue a ideia do
-``gen_4096.py``: o bit mais significativo e ligado para preservar o tamanho
-do numero e o bit menos significativo e ligado para gerar apenas candidatos
-impares.
+O teste de primalidade é baseado no algoritmo Miller-Rabin fornecido no
+arquivo ``primo_hyper.py``. A geração dos candidatos segue a ideia do
+``gen_4096.py``: o bit mais significativo é ligado para preservar o tamanho
+do número e o bit menos significativo é ligado para gerar apenas candidatos
+ímpares.
 
-Para uma aplicacao real, prefira uma biblioteca criptografica auditada. Este
-modulo existe para tornar visiveis as etapas matematicas solicitadas na
+Para uma aplicação real, prefira uma biblioteca criptográfica auditada. Este
+módulo existe para tornar visíveis as etapas matemáticas solicitadas na
 atividade.
 """
 
@@ -30,7 +30,7 @@ RSA_PADDING_NAME = "RSAES-PKCS1-v1_5"
 
 @dataclass(frozen=True)
 class PublicKey:
-    """Parte publica da chave RSA: ``(n, e)``."""
+    """Parte pública da chave RSA: ``(n, e)``."""
 
     n: int
     e: int
@@ -38,24 +38,24 @@ class PublicKey:
 
 @dataclass(frozen=True)
 class PrivateKey:
-    """Parte privada necessaria para decifrar: ``(n, d)``."""
+    """Parte privada necessária para decifrar: ``(n, d)``."""
 
     n: int
     d: int
 
 
 def is_probable_prime(n: int, rounds: int = MILLER_RABIN_ROUNDS) -> bool:
-    """Retorna se ``n`` provavelmente e primo usando Miller-Rabin.
+    """Retorna se ``n`` provavelmente é primo usando Miller-Rabin.
 
-    Para valores menores que 2**64 sao usadas as mesmas bases deterministicas
+    Para valores menores que 2**64 são usadas as mesmas bases determinísticas
     do PrimoHyper. Para valores maiores, como os candidatos de 2048 bits,
-    sao escolhidas bases aleatorias de forma criptograficamente segura.
+    são escolhidas bases aleatórias de forma criptograficamente segura.
     """
 
     if n < 2:
         return False
 
-    # Pre-checagem barata para eliminar rapidamente compostos pequenos.
+    # Pré-checagem barata para eliminar rapidamente compostos pequenos.
     small_primes = (2, 3, 5, 7, 11, 13, 17, 19, 23, 29, 31, 37)
     if n in small_primes:
         return True
@@ -63,7 +63,7 @@ def is_probable_prime(n: int, rounds: int = MILLER_RABIN_ROUNDS) -> bool:
         if n % prime == 0:
             return False
 
-    # Escreve n - 1 como d * 2**s, com d impar.
+    # Escreve n - 1 como d * 2**s, com d ímpar.
     d = n - 1
     s = 0
     while d % 2 == 0:
@@ -105,11 +105,11 @@ def is_probable_prime(n: int, rounds: int = MILLER_RABIN_ROUNDS) -> bool:
 
 
 def random_odd_candidate(bits: int) -> int:
-    """Gera um candidato impar com exatamente ``bits`` bits.
+    """Gera um candidato ímpar com exatamente ``bits`` bits.
 
-    Esta e a versao reutilizavel da estrategia do ``gen_4096.py``. O modulo
+    Esta é a versão reutilizável da estratégia do ``gen_4096.py``. O módulo
     usa ``secrets`` no lugar de ``random`` porque os valores participam da
-    geracao de chaves criptograficas.
+    geração de chaves criptográficas.
     """
 
     if bits < 2:
@@ -122,7 +122,7 @@ def random_odd_candidate(bits: int) -> int:
 
 
 def generate_prime(bits: int = PRIME_BITS) -> int:
-    """Gera um primo provavel com ``bits`` bits."""
+    """Gera um primo provável com ``bits`` bits."""
 
     while True:
         candidate = random_odd_candidate(bits)
@@ -131,7 +131,7 @@ def generate_prime(bits: int = PRIME_BITS) -> int:
 
 
 def _extended_gcd(a: int, b: int) -> Tuple[int, int, int]:
-    """Calcula ``gcd(a, b)`` e os coeficientes de Bezout."""
+    """Calcula ``gcd(a, b)`` e os coeficientes de Bézout."""
 
     if b == 0:
         return a, 1, 0
@@ -140,20 +140,20 @@ def _extended_gcd(a: int, b: int) -> Tuple[int, int, int]:
 
 
 def modular_inverse(value: int, modulus: int) -> int:
-    """Retorna o inverso modular de ``value`` modulo ``modulus``."""
+    """Retorna o inverso modular de ``value`` módulo ``modulus``."""
 
     gcd, coefficient, _ = _extended_gcd(value, modulus)
     if gcd != 1:
-        raise ValueError("Nao existe inverso modular para os valores informados")
+        raise ValueError("Não existe inverso modular para os valores informados")
     return coefficient % modulus
 
 
 def generate_key_pair(bits: int = RSA_BITS) -> Tuple[PublicKey, PrivateKey]:
-    """Gera um par RSA cujo modulo possui exatamente ``bits`` bits.
+    """Gera um par RSA cujo módulo possui exatamente ``bits`` bits.
 
     Com ``bits=4096``, cada fator primo possui 2048 bits. Gerar dois primos
-    de 4096 bits produziria um modulo de aproximadamente 8192 bits, por isso
-    o tamanho dos fatores e metade do tamanho desejado para a chave RSA.
+    de 4096 bits produziria um módulo de aproximadamente 8192 bits, por isso
+    o tamanho dos fatores é metade do tamanho desejado para a chave RSA.
     """
 
     if bits < 1024 or bits % 2 != 0:
@@ -167,7 +167,7 @@ def generate_key_pair(bits: int = RSA_BITS) -> Tuple[PublicKey, PrivateKey]:
             continue
 
         n = p * q
-        # Os fatores tem 2048 bits, mas o produto pode ocasionalmente ter
+        # Os fatores têm 2048 bits, mas o produto pode ocasionalmente ter
         # 4095 bits. Nesse caso, gere outro par para satisfazer a atividade.
         if n.bit_length() != bits:
             continue
@@ -181,7 +181,7 @@ def generate_key_pair(bits: int = RSA_BITS) -> Tuple[PublicKey, PrivateKey]:
 
 
 def _modulus_bytes(modulus: int) -> int:
-    """Calcula o tamanho do modulo em bytes."""
+    """Calcula o tamanho do módulo em bytes."""
 
     return (modulus.bit_length() + 7) // 8
 
@@ -189,9 +189,9 @@ def _modulus_bytes(modulus: int) -> int:
 def rsa_encrypt(message: bytes, public_key: PublicKey) -> bytes:
     """Cifra bytes com RSA e preenchimento PKCS#1 v1.5.
 
-    O preenchimento inclui bytes aleatorios, portanto duas cifragens da mesma
-    mensagem normalmente produzem cifrados diferentes. Um modulo de 4096
-    bits comporta ate ``k - 11`` bytes neste esquema.
+    O preenchimento inclui bytes aleatórios, portanto duas cifragens da mesma
+    mensagem normalmente produzem cifrados diferentes. Um módulo de 4096
+    bits comporta até ``k - 11`` bytes neste esquema.
     """
 
     if not isinstance(message, bytes):
@@ -201,8 +201,8 @@ def rsa_encrypt(message: bytes, public_key: PublicKey) -> bytes:
     max_message_size = block_size - 11
     if len(message) > max_message_size:
         raise ValueError(
-            f"Mensagem muito longa: no maximo {max_message_size} bytes "
-            f"para este modulo"
+            f"Mensagem muito longa: no máximo {max_message_size} bytes "
+            f"para este módulo"
         )
 
     padding_size = block_size - len(message) - 3
@@ -229,26 +229,26 @@ def rsa_decrypt(ciphertext: bytes, private_key: PrivateKey) -> bytes:
 
     ciphertext_number = int.from_bytes(ciphertext, byteorder="big")
     if ciphertext_number >= private_key.n:
-        raise ValueError("O texto cifrado nao pertence ao modulo RSA")
+        raise ValueError("O texto cifrado não pertence ao módulo RSA")
 
     encoded_number = pow(ciphertext_number, private_key.d, private_key.n)
     encoded_message = encoded_number.to_bytes(block_size, byteorder="big")
 
     if not encoded_message.startswith(b"\x00\x02"):
-        raise ValueError("Preenchimento RSA invalido")
+        raise ValueError("Preenchimento RSA inválido")
 
     separator = encoded_message.find(b"\x00", 2)
     if separator < 0:
-        raise ValueError("Separador do preenchimento RSA nao encontrado")
+        raise ValueError("Separador do preenchimento RSA não encontrado")
 
     padding = encoded_message[2:separator]
     if len(padding) < 8 or any(byte == 0 for byte in padding):
-        raise ValueError("Preenchimento RSA invalido")
+        raise ValueError("Preenchimento RSA inválido")
     return encoded_message[separator + 1 :]
 
 
 def public_key_to_payload(public_key: PublicKey, role: str) -> Dict[str, Any]:
-    """Converte a chave publica para o JSON enviado em texto puro."""
+    """Converte a chave pública para o JSON enviado em texto puro."""
 
     return {
         "type": "public_key",
@@ -261,10 +261,10 @@ def public_key_to_payload(public_key: PublicKey, role: str) -> Dict[str, Any]:
 
 
 def public_key_from_payload(payload: Dict[str, Any]) -> PublicKey:
-    """Valida e reconstrui uma chave publica recebida pelo TCP."""
+    """Valida e reconstrói uma chave pública recebida pelo TCP."""
 
     if payload.get("type") != "public_key":
-        raise ValueError("Era esperada uma mensagem de chave publica")
+        raise ValueError("Era esperada uma mensagem de chave pública")
     if payload.get("algorithm") != "RSA-4096":
         raise ValueError("Algoritmo ou tamanho de chave inesperado")
 
@@ -273,17 +273,17 @@ def public_key_from_payload(payload: Dict[str, Any]) -> PublicKey:
         exponent = int(payload["e"])
         declared_bits = int(payload["bits"])
     except (KeyError, TypeError, ValueError) as exc:
-        raise ValueError("Campos invalidos na chave publica") from exc
+        raise ValueError("Campos inválidos na chave pública") from exc
 
     if modulus <= 0 or modulus.bit_length() != RSA_BITS or declared_bits != RSA_BITS:
-        raise ValueError("A chave publica recebida nao possui 4096 bits")
+        raise ValueError("A chave pública recebida não possui 4096 bits")
     if exponent != PUBLIC_EXPONENT:
-        raise ValueError("Expoente publico inesperado")
+        raise ValueError("Expoente público inesperado")
     return PublicKey(n=modulus, e=exponent)
 
 
 def encrypted_payload(ciphertext: bytes, message_type: str) -> Dict[str, Any]:
-    """Monta um pacote JSON para transportar o cifrado em Base64."""
+    """Monta um pacote JSON para transportar o texto cifrado em Base64."""
 
     return {
         "type": message_type,
@@ -294,14 +294,14 @@ def encrypted_payload(ciphertext: bytes, message_type: str) -> Dict[str, Any]:
 
 
 def ciphertext_from_payload(payload: Dict[str, Any], expected_type: str) -> bytes:
-    """Extrai e valida o cifrado Base64 de um pacote JSON."""
+    """Extrai e valida o texto cifrado em Base64 de um pacote JSON."""
 
     if payload.get("type") != expected_type:
         raise ValueError(f"Era esperada uma mensagem do tipo {expected_type}")
     if payload.get("algorithm") != RSA_PADDING_NAME:
         raise ValueError("Esquema RSA inesperado")
     if payload.get("encoding") != "base64":
-        raise ValueError("Codificacao do texto cifrado inesperada")
+        raise ValueError("Codificação do texto cifrado inesperada")
 
     try:
         encoded_ciphertext = payload["ciphertext"]
@@ -315,4 +315,4 @@ def ciphertext_from_payload(payload: Dict[str, Any], expected_type: str) -> byte
         ValueError,
         binascii.Error,
     ) as exc:
-        raise ValueError("Texto cifrado Base64 invalido") from exc
+        raise ValueError("Texto cifrado Base64 inválido") from exc
